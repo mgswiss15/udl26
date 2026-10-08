@@ -65,11 +65,16 @@ def bernoulli_logpdf(B, p, eps=1e-3):
 
 # ---- plots ---------------------------------------------------------------------------------
 
-def plot_1d_fit(ax, data, samples, logpdf=None, title="", xlim=(0, 14), bins=28):
+def plot_1d_fit(ax, data, samples, logpdf=None, title="", xlim=(0, 14), bins=28, edges=None):
     """Histogram of the data (blue), of the samples from the model (orange outline), model density (red, optional).
     logpdf: function mapping a tensor of shape (M,) to log densities of shape (M,)."""
     ax.hist(to_numpy(data), bins=bins, range=xlim, density=True, color=BLUE, edgecolor="#163c69", alpha=0.8, label="data")
-    ax.hist(to_numpy(samples), bins=bins, range=xlim, density=True, histtype="step", color=ORANGE, lw=1.8, label="samples")
+    if torch.is_tensor(edges):
+        bins_samples = len(edges - 1)
+        xlim_samples = (edges[0].item(), edges[-1].item())
+    else:
+        bins_samples, xlim_samples = bins, xlim
+    ax.hist(to_numpy(samples), bins=bins_samples, range=xlim_samples, density=True, histtype="step", color=ORANGE, lw=1.8, label="samples")
     if logpdf is not None:
         xs = torch.linspace(xlim[0], xlim[1], 400, dtype=torch.float64)
         ax.plot(to_numpy(xs), to_numpy(torch.exp(logpdf(xs))), color=RED, lw=2, label="model density")

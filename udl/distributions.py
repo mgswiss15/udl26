@@ -23,10 +23,4 @@ def gmm_logpdf(X, pis, mus, Sigmas):
     return torch.logsumexp(logp, dim=1)
 
 
-def init_gmm(X, k, seed=0):
-    """Starting point for EM: k random data points as means, the data covariance for every component, equal weights."""
-    d = X.shape[1]
-    g = torch.Generator().manual_seed(seed)
-    idx = torch.randperm(len(X), generator=g)[:k]
-    cov = torch.cov(X.T, correction=0).reshape(d, d) + REG * torch.eye(d)
-    return torch.full((k,), 1.0 / k), X[idx].clone(), cov.expand(k, d, d).clone()
+

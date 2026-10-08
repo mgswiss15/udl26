@@ -5,17 +5,18 @@ Shapes:  data X (N, d)   weights pis (K,)   means mus (K, d)   covariances Sigma
 """
 import torch
 
-from udl.distributions import REG, init_gmm, log_gaussian  # provided
+from udl.distributions import REG, log_gaussian  # provided
 
 
 def e_step(X, pis, mus, Sigmas):
     """Expectation step.
 
     Returns resp (N, K), the probability that example i comes from component k under the current parameters,
-    and the log-likelihood sum_i log p(x_i) of the data under the current parameters (a float).
+    and the log-likelihood=sum_i log p(x_i) of the data under the current parameters (a float).
     """
     # TODO: for every example and component the log of (weight x density of the component), normalise over components
     raise NotImplementedError
+    return resp, log_likelihood
 
 
 def m_step(X, resp):
@@ -27,14 +28,25 @@ def m_step(X, resp):
     K = resp.shape[1]
     # TODO: treat the responsibilities as fractional counts and compute weights, means and covariances of every component
     raise NotImplementedError
+    return pis, mus, Sigmas
 
 
-def gmm_em(X, k, n_iter=100, seed=0):
+def init_gmm(X, k):
+    """Starting point for EM: initial means, covariance for every component, and weights.
+    
+    Returns initial pis, mus, and Sigmas.
+    """
+    # TODO: k random data points as means, the data covariance for every component, equal weights.
+    raise NotImplementedError
+    return pis, mus, Sigmas
+
+
+def gmm_em(X, k, n_iter=100):
     """Fit a mixture of k Gaussians to X (N, d).
 
     Returns pis, mus, Sigmas and the list of log-likelihoods (floats), one for every iteration.
     """
-    pis, mus, Sigmas = init_gmm(X, k, seed)  # provided starting point
+    pis, mus, Sigmas = init_gmm(X, k)  # provided starting point
     history = []
     for _ in range(n_iter):
         # TODO: one EM iteration - remember the log-likelihood before you update the parameters
